@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espetaria JRC - O Melhor Espetinho de Osasco</title>
+    <meta name="description" content="Espetaria JRC em Osasco - Ambiente rústico de alto padrão. Saboreie os melhores espetinhos premium, costela no rolete e a melhor transmissão de futebol ao vivo. Venha pra brasa!">
+    
+    <!-- Open Graph (Facebook / WhatsApp sharing) -->
+    <meta property="og:title" content="Espetaria JRC - O Melhor Espetinho de Osasco">
+    <meta property="og:description" content="Espetaria JRC - Churrasco premium, costela no rolete e futebol ao vivo em um ambiente cinematográfico.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://espetariajrc.com.br">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- GSAP & ScrollTrigger from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <!-- Fetch Priority Preload for first frames -->
+    <link rel="preload" href="frames/frame_0001.png" as="image" fetchpriority="high">
+    <link rel="preload" href="frames/frame_0010.png" as="image" fetchpriority="high">
+</head>
+<body>
+
+    <!-- PRELOADER -->
+    <div id="preloader">
+        <div class="loader-content">
+            <div class="loader-logo-container">
+                <svg class="loader-logo-fire" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2C12 2 17 6.5 17 11.5C17 14.5386 14.5386 17 11.5 17C8.46142 17 6 14.5386 6 11.5C6 9.5 7.5 7.5 7.5 7.5C7.5 7.5 9 10 10.5 10C12 10 12 7.5 12 5.5C12 3.5 12 2 12 2Z" fill="url(#fireGradient)" />
+                    <path d="M12 6C12 6 15 9 15 12.5C15 14.433 13.433 16 11.5 16C9.567 16 8 14.433 8 12.5C8 11.5 9 10 9 10C9 10 10 11.5 11 11.5C12 11.5 12 10 12 8.5C12 7.3 12 6 12 6Z" fill="url(#innerFireGradient)" />
+                    <defs>
+                        <linearGradient id="fireGradient" x1="12" y1="2" x2="12" y2="17" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#FF8C00" />
+                            <stop offset="100%" stop-color="#FF4500" />
+                        </linearGradient>
+                        <linearGradient id="innerFireGradient" x1="12" y1="6" x2="12" y2="16" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stop-color="#FFE4B5" />
+                            <stop offset="100%" stop-color="#FF8C00" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <h1 class="loader-title">ESPETARIA JRC</h1>
+            </div>
+            <div class="loader-bar-container">
+                <div class="loader-bar" id="loader-bar"></div>
+            </div>
+            <p class="loader-status">ACENDENDO A BRASA: <span id="load-percentage">0%</span></p>
+        </div>
+    </div>
+
+    <!-- CANVAS BACKGROUND (FIXED) -->
+    <div class="canvas-container">
+        <canvas id="hero-canvas"></canvas>
+        <div class="canvas-overlay"></div>
+    </div>
+
+    <!-- EMBERS PARTICLES CONTAINER -->
+    <div id="embers-container"></div>
+
+    <!-- MAIN INTERACTIVE OVERLAY CONTENT -->
+    <div class="scroll-wrapper">
+
+        <!-- HEADER / NAVIGATION -->
+        <header class="main-header">
+            <div class="header-container">
+                <a href="#" class="logo">
+                    <svg class="header-logo-svg" viewBox="0 0 160 45" fill="none" xmlns="http://www.w3.org/2000/svg" style="height: 40px; width: auto; display: block;">
+                        <!-- Flame icon -->
+                        <path d="M18 10C18 10 22 14 22 18C22 21.5 20 24 17 24C14 24 12 21.5 12 18C12 16.5 13 15 13 15C13 15 14.5 17 15.5 17C16.5 17 17 15 17 13.5C17 12 18 10 18 10Z" fill="url(#logoFireGradient)" />
+                        <!-- Skewer handle and tip -->
+                        <line x1="6" y1="28" x2="154" y2="28" stroke="#FF4500" stroke-width="2" stroke-linecap="round" />
+                        <path d="M6 28L2 25M6 28L2 31" stroke="#FF4500" stroke-width="2" stroke-linecap="round" />
+                        <!-- Text elements -->
+                        <text x="28" y="22" font-family="'Bebas Neue', sans-serif" font-size="22" font-weight="bold" fill="#FFFFFF" letter-spacing="1.5">JRC</text>
+                        <text x="58" y="21" font-family="'Bebas Neue', sans-serif" font-size="22" font-weight="bold" fill="#FF4500" letter-spacing="1.5">ESPETARIA</text>
+                        <text x="28" y="38" font-family="'Inter', sans-serif" font-size="7" font-weight="800" fill="#a0a0a0" letter-spacing="4"> PREMIUM BRASA</text>
+                        <defs>
+                            <linearGradient id="logoFireGradient" x1="17" y1="10" x2="17" y2="24" gradientUnits="userSpaceOnUse">
+                                <stop offset="0%" stop-color="#FF8C00" />
+                                <stop offset="100%" stop-color="#FF4500" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </a>
+                <nav class="nav-menu">
+                    <a href="#inicio" class="nav-link active">Conceito</a>
+                    <a href="#cardapio" class="nav-link">Funcionalidades</a>
+                    <a href="#eventos" class="nav-link">O Protocolo</a>
+                    <a href="#reviews" class="nav-link">Reviews</a>
+                </nav>
+                <a href="https://wa.me/5511925771267?text=Ol%C3%A1%21+Gostaria+de+fazer+um+pedido+na+Espetaria+JRC." target="_blank" class="btn-primary header-btn">
+                    Pedir Agora
+                </a>
+            </div>
+        </header>
+
+        <!-- SECTION 1: HERO -->
+        <section id="inicio" class="section hero-section">
+            <div class="hero-content">
+                <div class="hero-tag">
+                    <span class="tag-icon">🔥</span> ESPETOS PREMIUM & BRASA QUENTE
+                </div>
+                <h1 class="hero-title">
+                    <span class="reveal-line">O MELHOR ESPETINHO</span>
+                    <span class="reveal-line text-gradient">DO BAIRRO!</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Um ambiente cinematográfico com o sabor tradicional do churrasco na brasa, costela no rolete caipira e transmissão de futebol ao vivo.
+                </p>
+                <div class="hero-actions">
+                    <a href="#cardapio" class="btn-primary">Ver Cardápio</a>
+                    <a href="#contato" class="btn-secondary">Como Chegar</a>
+                </div>
+                <div class="hero-highlights">
+                    <div class="highlight-pill">
+                        <span class="pill-icon">🥩</span>
+                        <span class="pill-text">Cortes Selecionados</span>
+                    </div>
+                    <div class="highlight-pill">
+                        <span class="pill-icon">🍺</span>
+                        <span class="pill-text">Chopp Trincando</span>
+                    </div>
+                    <div class="highlight-pill">
+                        <span class="pill-icon">🔥</span>
+                        <span class="pill-text">Brasa Premium</span>
+                    </div>
+                    <div class="highlight-pill">
+                        <span class="pill-icon">⚽</span>
+                        <span class="pill-text">Futebol ao Vivo</span>
+                    </div>
+                </div>
+            </div>
+            <div class="scroll-indicator">
+                <span class="scroll-mouse">
+                    <span class="scroll-wheel"></span>
+                </span>
+                <span class="scroll-text">Role para acender a brasa</span>
+            </div>
+        </section>
+
+        <!-- SECTION 2: CARDÁPIO (3D BOOK PAGE FLIP) -->
+        <section id="cardapio" class="section cardapio-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-subtitle">SABOR NA BRASA</span>
+                    <h2 class="section-title">CARDÁPIO PREMIUM</h2>
+                    <p class="section-desc">Toque nas páginas ou use os controles para folhear o nosso cardápio de espetinhos tradicionais e lanches.</p>
+                </div>
+
+                <!-- 3D BOOK CONTAINER -->
+                <div class="book-wrapper">
+                    <div class="book" id="menu-book">
+                        
+                        <!-- FOLHA 1 (Capa / Contra-capa) -->
+                        <div class="book-page page-1 active" style="z-index: 10;">
+                            <!-- Frente (Capa do Livro) -->
+                            <div class="page-face front">
+                                <div class="cover-design">
+                                    <div class="cover-border">
+                                        <svg class="cover-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M50 15C50 15 57 28 57 37C57 44.5 53.5 50 48.5 50C43.5 50 40 44.5 40 37C40 33.5 42.5 30 42.5 30C42.5 30 45 34.5 46.5 34.5C48 34.5 49 30.5 49 27.5C49 24.5 50 15 50 15Z" fill="url(#coverFireGradient)" />
+                                            <circle cx="50" cy="50" r="42" stroke="#FF4500" stroke-width="2" stroke-dasharray="6 4" />
+                                            <defs>
+                                                <linearGradient id="coverFireGradient" x1="50" y1="15" x2="50" y2="50" gradientUnits="userSpaceOnUse">
+                                                    <stop offset="0%" stop-color="#FF8C00" />
+                                                    <stop offset="100%" stop-color="#FF4500" />
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                        <h2 class="cover-title">ESPETARIA JRC</h2>
+                                        <span class="cover-subtitle">CARDÁPIO DIGITAL</span>
+                                        <div class="cover-divider"></div>
+                                        <p class="cover-instruction">CLIQUE NA PÁGINA PARA ABRIR</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Verso (Página 1 do Cardápio) -->
+                            <div class="page-face back">
+                                <div class="menu-page-wrapper" style="background-image: linear-gradient(rgba(10,10,10,0.85), rgba(10,10,10,0.95)), url('assets/medalhao_frango.jpg'); background-size: cover; background-position: center;">
+                                    <div class="menu-category-title">CHURRASCO SUCULENTO</div>
+                                    
+                                    <div class="menu-item">
+                                        <div class="menu-item-head">
+                                            <span class="item-name">Medalhão de Frango c/ Bacon</span>
+                                            <span class="item-price">R$ 14,00</span>
+                                        </div>
+                                        <p class="item-description">Peito de frango suculento envolvido em fatias de bacon crocante assado na brasa quente.</p>
+                                    </div>
+                                    
+                                    <div class="menu-item">
+                                        <div class="menu-item-head">
+                                            <span class="item-name">Cupim com Queijo na Brasa</span>
+                                            <span class="item-price">R$ 16,00</span>
+                                        </div>
+                                        <p class="item-description">Cupim temperado defumado lentamente no bafo e finalizado com crosta gratinada de queijo coalho.</p>
+                                    </div>
+                                    
+                                    <div class="menu-item">
+                                        <div class="menu-item-head">
+                                            <span class="item-name">Kafta Premium Temperada</span>
+                                            <span class="item-price">R$ 13,00</span>
+                                        </div>
+                                        <p class="item-description">Espeto de carne bovina moída fresca temperada com hortelã fresca e mix de especiarias.</p>
+                                    </div>
+                                    <div class="page-number">Pág. 1</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FOLHA 2 (Páginas internas) -->
+                        <div class="book-page page-2" style="z-index: 5;">
+                            <!-- Frente (Página 2 do Cardápio) -->
+                            <div class="page-face front">
+                                <div class="menu-page-wrapper" style="background-image: linear-gradient(rgba(10,10,10,0.85), rgba(10,10,10,0.95)), url('assets/lanche_espeto.jpg'); background-size: cover; background-position: center;">
+                                    <div class="menu-category-title">ACOMPANHAMENTOS & LANCHES</div>
+                                    
+                                    <div class="menu-item">
+                                        <div class="menu-item-head">
+                                            <span class="item-name">Espeto no Pão com Vinagrete</span>
+                                            <span class="item-price">R$ 22,00</span>
+                                        </div>
+                                        <p class="item-description">O clássico absoluto da casa. Pão francês fresquinho, espetinho à sua escolha, vinagrete da casa picadinho e molho verde.</p>
+                                    </div>
+                                    
+                                    <div class="menu-item">
+                                        <div class="menu-item-head">
+                                            <span class="item-name">Pão de Alho Crocante</span>
+                                            <span class="item-price">R$ 10,00</span>
+                                        </div>
+                                        <p class="item-description">Pão baguete super recheado com creme de alho suave da casa e muçarela gratinada na brasa.</p>
+                                    </div>
+                                    
+                                    <div class="menu-item">
+                                        <div class="menu-item-head">
+                                            <span class="item-name">Queijo Coalho c/ Melaço</span>
+                                            <span class="item-price">R$ 12,00</span>
+                                        </div>
+                                        <p class="item-description">Duas espetas de queijo coalho douradas por fora e derretidas por dentro, regadas com melaço de cana.</p>
+                                    </div>
+                                    <div class="page-number">Pág. 2</div>
+                                </div>
+                            </div>
+                            <!-- Verso (Contra-capa final) -->
+                            <div class="page-face back">
+                                <div class="cover-design back-cover">
+                                    <div class="cover-border">
+                                        <h3 class="back-cover-title">Espetaria JRC</h3>
+                                        <p class="back-cover-text">O verdadeiro sabor da brasa tradicional desde Osasco.</p>
+                                        <div class="cover-divider"></div>
+                                        <svg class="cover-fire-mini" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 25px; height: 25px; margin: 15px auto;">
+                                            <path d="M12 2C12 2 17 6.5 17 11.5C17 14.5386 14.5386 17 11.5 17C8.46142 17 6 14.5386 6 11.5C6 9.5 7.5 7.5 7.5 7.5C7.5 7.5 9 10 10.5 10C12 10 12 7.5 12 5.5C12 3.5 12 2 12 2Z" fill="#FF4500" />
+                                        </svg>
+                                        <p class="cover-thanks">BOM APETITE!</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <!-- CONTROLES DO CARDÁPIO -->
+                    <div class="book-controls">
+                        <button class="book-control-btn prev-page-btn" id="book-prev-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                            Voltar Folha
+                        </button>
+                        <button class="book-control-btn next-page-btn" id="book-next-btn">
+                            Próxima Folha
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                        </button>
+                    </div>
+
+                    <!-- HARMONIZAÇÃO E DICAS DO ASSADOR -->
+                    <div class="cardapio-extras-grid">
+                        <div class="extra-card tips-card">
+                            <div class="extra-card-header">
+                                <span class="extra-icon">🥩</span>
+                                <h3>O PONTO DA BRASA</h3>
+                            </div>
+                            <p class="extra-text">
+                                Nossos assadores dominam a arte do fogo. Selamos os espetinhos em alta temperatura para reter o suco da carne, garantindo maciez por dentro e aquela crosta dourada perfeita por fora.
+                            </p>
+                            <ul class="extra-list">
+                                <li><strong>Mal Passado:</strong> Suculência máxima, interior avermelhado e super macio.</li>
+                                <li><strong>Ao Ponto:</strong> O equilíbrio perfeito. Rosado no centro, quente e macio.</li>
+                                <li><strong>Bem Passado:</strong> Grelhado lentamente, sem perder o sabor tradicional.</li>
+                            </ul>
+                        </div>
+
+                        <div class="extra-card pairing-card">
+                            <div class="extra-card-header">
+                                <span class="extra-icon">🍺</span>
+                                <h3>HARMONIZAÇÃO PREMIUM</h3>
+                            </div>
+                            <p class="extra-text">
+                                Melhore sua experiência combinando nossos espetos premium com a bebida perfeita:
+                            </p>
+                            <ul class="extra-list">
+                                <li><strong>Medalhão de Frango + Pilsen:</strong> O frescor da pilsen corta a gordura do bacon perfeitamente.</li>
+                                <li><strong>Cupim com Queijo + IPA:</strong> O amargor e aroma floral da IPA realçam o sabor defumado do cupim.</li>
+                                <li><strong>Kafta + Stout:</strong> As notas tostadas da Stout casam com o mix de temperos.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: EVENTOS & FUTEBOL -->
+        <section id="eventos" class="section eventos-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-subtitle">PROGRAMAÇÃO</span>
+                    <h2 class="section-title">EVENTOS & FUTEBOL</h2>
+                    <p class="section-desc">O melhor futebol do bairro, cerveja trincando e eventos tradicionais caipiras.</p>
+                </div>
+
+                <div class="eventos-grid">
+                    <!-- Card 1: Costelada -->
+                    <div class="evento-card">
+                        <div class="evento-img" style="background-image: url('assets/costelada.jpg');"></div>
+                        <div class="evento-badge">Toda Semana</div>
+                        <div class="evento-content">
+                            <h3 class="evento-title">Costelada no Rolete Caipira</h3>
+                            <p class="evento-text">
+                                A nossa tradicional <strong>Costela no Rolete de 70kg</strong>, assada lentamente por mais de 8 horas no tacho. Uma carne tão macia que desmancha do osso. Servida com acompanhamentos típicos do interior.
+                            </p>
+                            <div class="evento-details">
+                                <span><strong>Volume:</strong> 70kg por lote</span>
+                                <span><strong>Preparo:</strong> Fogo de chão caipira</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Futebol -->
+                    <div class="evento-card">
+                        <div class="evento-img" style="background-image: url('assets/futebol.jpg');"></div>
+                        <div class="evento-badge">Ao Vivo</div>
+                        <div class="evento-content">
+                            <h3 class="evento-title">Transmissão de Jogos ao Vivo</h3>
+                            <p class="evento-text">
+                                Assista aos principais campeonatos (Brasileirão, Copa do Mundo, Libertadores e Champions League) com a melhor atmosfera. Telões de alta definição instalados estrategicamente e som surround imersivo.
+                            </p>
+                            <div class="evento-details">
+                                <span><strong>Cerveja:</strong> Sempre trincando</span>
+                                <span><strong>Espetos:</strong> Saindo na hora</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHALKBOARD CALENDAR -->
+                <div class="chalkboard-container">
+                    <div class="chalkboard-board">
+                        <h3 class="chalk-title">🔥 PROGRAMAÇÃO DA SEMANA 🔥</h3>
+                        <div class="chalk-divider"></div>
+                        <div class="chalk-grid">
+                            <div class="chalk-day-row">
+                                <span class="chalk-day">TERÇA</span>
+                                <span class="chalk-event">ESPETINHO EM DOBRO - Peça 1 espeto tradicional e ganhe outro!</span>
+                            </div>
+                            <div class="chalk-day-row">
+                                <span class="chalk-day">QUARTA</span>
+                                <span class="chalk-event">FUTEBOL & CHOPP DOBRADO - Rodada dupla de chopp durante a transmissão dos jogos.</span>
+                            </div>
+                            <div class="chalk-day-row">
+                                <span class="chalk-day">SEXTA</span>
+                                <span class="chalk-event">NOITE DA COSTELA DEFUMADA - Lotes especiais de costela no bafo servidos quentinhos.</span>
+                            </div>
+                            <div class="chalk-day-row">
+                                <span class="chalk-day">SÁBADO</span>
+                                <span class="chalk-event">RODÍZIO PREMIUM & PAGODE - Música ao vivo no deck com espetos saindo sem parar.</span>
+                            </div>
+                            <div class="chalk-day-row">
+                                <span class="chalk-day">DOMINGO</span>
+                                <span class="chalk-event">COSTELA NO ROLETE CAIPIRA - Almoço especial de domingo com a nossa famosa costela de 70kg.</span>
+                            </div>
+                        </div>
+                        <p class="chalk-note">* Horários de funcionamento detalhados no rodapé da página.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: REVIEWS (DIAGONAL CAROUSEL) -->
+        <section id="reviews" class="section reviews-section">
+            <div class="section-container">
+                <div class="section-header">
+                    <span class="section-subtitle">DEPOIMENTOS</span>
+                    <h2 class="section-title">QUEM PROVA, RECOMENDA!</h2>
+                    <p class="section-desc">Veja o que os nossos clientes dizem sobre a nossa brasa, ambiente e atendimento.</p>
+                </div>
+            </div>
+
+            <!-- REVIEWS SLIDER CONTAINERS -->
+            <div class="reviews-marquee-wrapper">
+                <!-- ROW 1 (Left to Right) -->
+                <div class="reviews-marquee-row marquee-left">
+                    <div class="reviews-marquee-track">
+                        <!-- Review Card 1 -->
+                        <div class="review-card">
+                            <div class="review-stars">★★★★★</div>
+                            <p class="review-text">"O medalhão de frango com bacon deles é insuperável! Cerveja sempre gelada e o ambiente é nota 10 para assistir ao Brasileirão!"</p>
+                            <span class="review-author">Roberto Silva - Osasco</span>
+                        </div>
+                        <!-- Review Card 2 -->
+                        <div class="review-card">
+                            <div class="review-stars">★★★★★</div>
+                            <p class="review-text">"A costela no rolete desmancha na boca! Acompanhamentos deliciosos e atendimento rápido mesmo em dia de casa cheia. Nota mil!"</p>
+                            <span class="review-author">Mariana Costa - Alphaville</span>
+                        </div>
+                        <!-- Review Card 3 -->
+                        <div class="review-card">
+                            <div class="review-stars">★★★★★</div>
+                            <p class="review-text">"Sensacional o espeto no pão! O vinagrete é muito fresco e o molho verde de alho é viciante. Recomendo demais o local!"</p>
+                            <span class="review-author">Thiago Ramos - Osasco</span>
+                        </div>
+                        <!-- Review Card 4 -->
+                        <div class="review-card">
+                            <div class="review-stars">★★★★★</div>
+                            <p class="review-text">"Espetinho de qualidade premium com preço justo. Transmissão da Champions League com telão excelente. Meu lugar favorito!"</p>
+                            <span class="review-author">Lucas Mendes - Carapicuíba</span>
+                        </div>
+                        <!-- Duplicate cards for infinite loop -->
+                        <div class="review-card">
+                            <div class="review-stars">★★★★★</div>
+                            <p class="review-text">"O medalhão de frango com bacon deles é insuperável! Cerveja sempre gelada e o ambiente é nota 10 para assistir ao Brasileirão!"</p>
+                            <span class="review-author">Roberto Silva - Osasco</span>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-stars">★★★★★</div>
+                            <p class="review-text">"A costela no rolete desmancha na boca! Acompanhamentos deliciosos e atendimento rápido mesmo em dia de casa cheia. Nota mil!"</p>
+                            <span class="review-author">Mariana Costa - Alphaville</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROW 2 (Right to Left) -->
+                <div class="reviews-marquee-row marquee-right">
+                    <div class="reviews-marquee-track">
+                        <!-- Review Card 5 -->
+                        <div class="review-card">
+                            <div class="review-stars">★★★★★</div>
+                            <p class="review-text">"Fui domingo almoçar a costela no rolete com a família e adoramos! Ambiente rústico cinematográfico muito agradável e espaçoso."</p>
+                            <span class="review-author">Aline Souza - Barueri</span>
+                        </div>
+                        <!-- Review Card 6 -->
+                        <div class="review-card">
+                            <div class="review-stars">★★★★★</div>
+                            <p class="review-text">"Kafta super bem temperada com hortelã, suculenta por dentro. Pão de alho crocante incrível. Voltarei com certeza!"</p>
+                            <span class="review-author">Bruno Alves - Osasco</span>
+                        </div>
+                        <!-- Review Card 7 -->
+                        <div class="review-card">
+                            <div class="review-stars">★★★★★</div>
+                            <p class="review-text">"Melhor espetaria da região. Transmissão de futebol é maravilhosa, parecemos estar no estádio. Chopp trincando de gelado."</p>
+                            <span class="review-author">Marcelo Rocha - Osasco</span>
+                        </div>
+                        <!-- Review Card 8 -->
+                        <div class="review-card">
+                            <div class="review-stars">★★★★★</div>
+                            <p class="review-text">"O queijo coalho com melaço é uma obra de arte! Atendimento espetacular, equipe atenciosa e ágil."</p>
+                            <span class="review-author">Juliana Lima - Osasco</span>
+                        </div>
+                        <!-- Duplicate cards for infinite loop -->
+                        <div class="review-card">
+                            <div class="review-stars">★★★★★</div>
+                            <p class="review-text">"Fui domingo almoçar a costela no rolete com a família e adoramos! Ambiente rústico cinematográfico muito agradável e espaçoso."</p>
+                            <span class="review-author">Aline Souza - Barueri</span>
+                        </div>
+                        <div class="review-card">
+                            <div class="review-stars">★★★★★</div>
+                            <p class="review-text">"Kafta super bem temperada com hortelã, suculenta por dentro. Pão de alho crocante incrível. Voltarei com certeza!"</p>
+                            <span class="review-author">Bruno Alves - Osasco</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: RODAPÉ CTA & INFORMAÇÕES -->
+        <footer id="contato" class="section main-footer">
+            <div class="footer-container">
+                
+                <div class="footer-cta-block">
+                    <h2 class="cta-title">VAI UMA BRASA AÍ?</h2>
+                    <p class="cta-subtitle">Garanta sua mesa ou peça no WhatsApp!</p>
+                    <a href="https://wa.me/5511925771267?text=Ol%C3%A1%21+Gostaria+de+fazer+um+pedido%2Freserva." target="_blank" class="btn-whatsapp-pulsing">
+                        <svg class="whatsapp-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.5-5.729-1.45L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.967C16.58 2.019 14.12 1 11.517 1 6.08 1 1.657 5.37 1.653 10.8c-.001 1.776.47 3.51 1.365 5.066l-.993 3.627 3.738-.973c1.519.82 3.12 1.249 4.884 1.249zm11.233-7.53c-.31-.154-1.829-.9-2.114-1.002-.284-.103-.49-.154-.696.154-.206.31-.8.997-.98 1.205-.18.207-.359.231-.669.077-.31-.154-1.31-.482-2.494-1.538-.922-.821-1.543-1.835-1.724-2.144-.18-.309-.02-.477.135-.63.14-.137.31-.359.464-.539.15-.18.2-.308.3-.513.1-.205.05-.385-.025-.54-.075-.154-.696-1.677-.954-2.3-.25-.601-.505-.519-.696-.529-.18-.01-.387-.01-.594-.01-.207 0-.542.077-.826.385-.284.308-1.085 1.059-1.085 2.583 0 1.524 1.11 2.997 1.265 3.203.155.205 2.185 3.336 5.293 4.675.74.319 1.317.51 1.768.653.743.236 1.42.203 1.956.123.597-.089 1.83-.748 2.087-1.436.258-.688.258-1.28.18-1.405-.077-.124-.284-.205-.593-.359z"/>
+                        </svg>
+                        <span>Chama no Zap: (11) 92577-1267</span>
+                    </a>
+                </div>
+
+                <div class="footer-info-grid">
+                    <!-- Localização -->
+                    <div class="footer-info-col">
+                        <div class="info-icon">📍</div>
+                        <h4>ONDE ESTAMOS</h4>
+                        <p class="info-val">Av. São José, 339<br>Ayrosa, Osasco - SP</p>
+                        <a href="https://maps.google.com/?q=Av.+S%C3%A3o+Jos%C3%A9,+339+-+Ayrosa,+Osasco" target="_blank" class="info-link">Como chegar no Google Maps &rarr;</a>
+                    </div>
+
+                    <!-- Horários -->
+                    <div class="footer-info-col">
+                        <div class="info-icon">🕒</div>
+                        <h4>HORÁRIOS DE ATENDIMENTO</h4>
+                        <ul class="hours-list">
+                            <li><span>Ter, Qua e Sex</span> <span>15h às 22h</span></li>
+                            <li><span>Sábado</span> <span>13h às 22h</span></li>
+                            <li><span>Domingo</span> <span>11h às 16h</span></li>
+                            <li class="closed-day"><span>Segunda e Quinta</span> <span>Fechado</span></li>
+                        </ul>
+                    </div>
+
+                    <!-- Contatos -->
+                    <div class="footer-info-col">
+                        <div class="info-icon">📞</div>
+                        <h4>RESERVAS & CONTATOS</h4>
+                        <p class="info-val">WhatsApp: (11) 92577-1267<br>Email: contato@espetariajrc.com.br</p>
+                        <div class="social-icons">
+                            <a href="#" class="social-link">Instagram</a>
+                            <span class="divider">•</span>
+                            <a href="#" class="social-link">Facebook</a>
+                        </div>
+                    </div>
+                <!-- CINEMATIC MAP BLOCK -->
+                <div class="footer-map-container">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3658.26127392658!2d-46.7725902!3d-23.5231267!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94cef84d5df65d49%3A0xe54e6012cc4cb1d2!2sAv.%20S%C3%A3o%20Jos%C3%A9%2C%20339%20-%20Ayrosa%2C%20Osasco%20-%20SP%2C%2006283-120!5e0!3m2!1spt-BR!2sbr!4v1700000000000!5m2!1spt-BR!2sbr" 
+                        width="100%" 
+                        height="350" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>&copy; 2026 Espetaria JRC. Todos os direitos reservados. Feito com 🔥 por Antigravity.</p>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- SIDE MAP GUIDE (LINE AND DOTS) -->
+    <div class="side-map-guide">
+        <div class="map-progress-line">
+            <div class="map-progress-fill"></div>
+        </div>
+        <div class="map-dots">
+            <a href="#inicio" class="map-dot-wrapper active" data-section="inicio">
+                <span class="map-label">Conceito</span>
+                <span class="map-dot"></span>
+            </a>
+            <a href="#cardapio" class="map-dot-wrapper" data-section="cardapio">
+                <span class="map-label">Funcionalidades</span>
+                <span class="map-dot"></span>
+            </a>
+            <a href="#eventos" class="map-dot-wrapper" data-section="eventos">
+                <span class="map-label">O Protocolo</span>
+                <span class="map-dot"></span>
+            </a>
+            <a href="#reviews" class="map-dot-wrapper" data-section="reviews">
+                <span class="map-label">Reviews</span>
+                <span class="map-dot"></span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Logic Script -->
+    <script src="main.js"></script>
+</body>
+</html>
