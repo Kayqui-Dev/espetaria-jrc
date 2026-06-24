@@ -12,49 +12,17 @@ const images = [];
 
 // Object that GSAP will tween to scroll through frames
 const scrollObj = { frame: 1 };
-let loadedCount = 0;
-let isLoaded = false;
-
-// Preload all PNG frames
+// Preload all PNG frames in background
 function preloadImages() {
     for (let i = 1; i <= frameCount; i++) {
         const img = new Image();
-        
-        img.onload = () => {
-            loadedCount++;
-            updatePreloader(loadedCount);
-        };
-        
-        img.onerror = () => {
-            console.warn(`Erro ao carregar o frame ${i}. Prosseguindo com fallback...`);
-            loadedCount++;
-            updatePreloader(loadedCount);
-        };
-        
         img.src = currentFrame(i);
+        if (i === 1) {
+            img.onload = () => {
+                renderFrame(1);
+            };
+        }
         images.push(img);
-    }
-}
-
-// Update the preloader progress bar and text
-function updatePreloader(count) {
-    const percent = Math.min(Math.floor((count / frameCount) * 100), 100);
-    const textEl = document.getElementById('load-percentage');
-    const barEl = document.getElementById('loader-bar');
-    
-    if (textEl) textEl.textContent = `${percent}%`;
-    if (barEl) barEl.style.width = `${percent}%`;
-    
-    if (count === frameCount && !isLoaded) {
-        isLoaded = true;
-        // Fade out the preloader and initialize the page
-        setTimeout(() => {
-            const preloader = document.getElementById('preloader');
-            if (preloader) {
-                preloader.classList.add('loaded');
-            }
-            initApp();
-        }, 600);
     }
 }
 
@@ -468,5 +436,6 @@ function createEmbers() {
     }
 }
 
-// Start loading the page
+// Start application immediately
+initApp();
 preloadImages();
