@@ -200,7 +200,6 @@ function animateHeroEntrance() {
     
     // Clear initial styles to avoid jumpiness
     gsap.set(".reveal-line", { y: "100%", opacity: 0 });
-    gsap.set(".hero-subtitle", { opacity: 0, y: 30 });
     gsap.set(".hero-actions", { opacity: 0, y: 20 });
     gsap.set(".hero-tag", { opacity: 0, scale: 0.8 });
     
@@ -217,12 +216,6 @@ function animateHeroEntrance() {
         duration: 1,
         ease: "back.out(1.7)"
     }, "-=1.0")
-    .to(".hero-subtitle", {
-        opacity: 1,
-        y: 0,
-        duration: 1.2,
-        ease: "power3.out"
-    }, "-=0.8")
     .to(".hero-actions", {
         opacity: 1,
         y: 0,
