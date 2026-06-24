@@ -1164,6 +1164,7 @@ a {
     transform-style: preserve-3d;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 12px;
+    touch-action: pan-y; /* Permite scroll vertical tocando no livro */
 }
 
 .book-page {
@@ -1453,57 +1454,78 @@ a {
     }
 }
 
+/* O livro 3D permanece com visual 3D em mobile através do escalonamento dinâmico em JS */
 @media (max-width: 768px) {
-    /* Em mobile o livro 3D vira uma pilha vertical simples para caber na tela */
-    .book {
-        width: 100%;
-        height: auto;
-        perspective: none;
-        transform-style: flat;
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
+    /* Ajustes finos adicionais para mobile no cardapio 3D se necessário */
+    .item-name {
+        font-size: 1.6rem;
     }
-    
-    .book-page {
-        position: relative;
-        left: 0;
-        width: 100%;
-        height: auto;
-        transform: none !important;
-        pointer-events: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
+}
+
+/* NEON LIVE SIGNAL LIGHT (A LUZINHA DE EVENTOS) */
+.neon-light-sign {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(10, 10, 10, 0.6);
+    border: 1px solid rgba(255, 69, 0, 0.25);
+    border-radius: 50px;
+    padding: 8px 18px;
+    margin-top: 15px;
+    box-shadow: 
+        0 0 10px rgba(255, 69, 0, 0.05),
+        inset 0 0 15px rgba(255, 69, 0, 0.1);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+
+.neon-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #FF4500;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #FF4500, 0 0 15px #FF8C00;
+    animation: neonBlink 1.4s infinite alternate ease-in-out;
+}
+
+.neon-text {
+    font-family: var(--font-accent);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.15em;
+    color: #FFF;
+    text-shadow: 
+        0 0 2px #fff,
+        0 0 6px var(--accent-orange),
+        0 0 12px #FF4500;
+    animation: neonPulseText 2s infinite alternate ease-in-out;
+}
+
+@keyframes neonBlink {
+    0% {
+        opacity: 0.3;
+        box-shadow: 0 0 2px #FF4500;
     }
-    
-    .page-face {
-        position: relative;
-        width: 100%;
-        height: auto !important;
-        backface-visibility: visible;
-        border-radius: 16px !important;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        transform: none !important;
+    100% {
+        opacity: 1;
+        box-shadow: 0 0 10px #FF4500, 0 0 20px #FF8C00, 0 0 30px #FF0000;
     }
-    
-    .page-face.back {
-        transform: none !important;
-        margin-top: 0;
+}
+
+@keyframes neonPulseText {
+    0% {
+        text-shadow: 
+            0 0 1px #fff,
+            0 0 4px var(--accent-orange),
+            0 0 8px #FF4500;
     }
-    
-    .menu-page-wrapper {
-        padding: 40px 30px;
-        height: auto !important;
-    }
-    
-    .cover-design {
-        padding: 60px 30px;
-        height: auto !important;
-    }
-    
-    .book-controls {
-        display: none; /* Oculta os botões no mobile pois as páginas empilham verticalmente */
+    100% {
+        text-shadow: 
+            0 0 3px #fff,
+            0 0 10px var(--accent-orange),
+            0 0 20px #FF4500,
+            0 0 30px #FF0000;
     }
 }
 

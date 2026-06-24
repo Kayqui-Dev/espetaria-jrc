@@ -83,6 +83,8 @@ function initApp() {
     
     // Initialize 3D Book Page Flip Menu
     initMenuBook();
+    resizeBook();
+    window.addEventListener('resize', resizeBook);
     
     // Initialize floating pill navbar scroll listener
     initNavbarScroll();
@@ -105,6 +107,50 @@ function resizeCanvas() {
     canvas.height = window.innerHeight;
     
     renderFrame(Math.floor(scrollObj.frame));
+}
+
+// Resize and scale 3D book to fit viewport on tablet/mobile
+function resizeBook() {
+    const book = document.getElementById('menu-book');
+    const wrapper = document.querySelector('.book-wrapper');
+    const controls = document.querySelector('.book-controls');
+    if (!book || !wrapper) return;
+
+    const bookWidth = 900;
+    const bookHeight = 580;
+
+    let scale = 1;
+    if (window.innerWidth < 950) {
+        scale = (window.innerWidth * 0.92) / bookWidth;
+    }
+
+    // Transform and center the book absolutely
+    book.style.transform = `translate(-50%, 0) scale(${scale})`;
+    book.style.transformOrigin = 'center top';
+    book.style.position = 'absolute';
+    book.style.top = '0';
+    book.style.left = '50%';
+
+    // Position controls at bottom of the wrapper
+    if (controls) {
+        controls.style.position = 'absolute';
+        controls.style.bottom = '0';
+        controls.style.left = '50%';
+        controls.style.transform = 'translateX(-50%)';
+        controls.style.margin = '0';
+        if (window.innerWidth < 768) {
+            controls.style.display = 'flex';
+        } else {
+            controls.style.display = '';
+        }
+    }
+
+    const controlsHeight = (controls && window.getComputedStyle(controls).display !== 'none') ? 60 : 0;
+    const wrapperHeight = (bookHeight * scale) + controlsHeight + 20;
+    wrapper.style.height = `${wrapperHeight}px`;
+    
+    // Refresh ScrollTrigger since layout sizes changed
+    ScrollTrigger.refresh();
 }
 
 // Render a specific frame on canvas with "background-size: cover" math
@@ -220,7 +266,7 @@ function initRevealAnimations() {
     gsap.from(".evento-card", {
         scrollTrigger: {
             trigger: ".eventos-section",
-            start: "top 70%",
+            start: "top 95%",
             toggleActions: "play none none none"
         },
         opacity: 0,
@@ -422,9 +468,6 @@ function initMenuBook() {
     book.addEventListener('pointerdown', (e) => {
         if (e.target.closest('a') || e.target.closest('button')) return;
         
-        // Skip drag tracking on mobile stacked viewports
-        if (window.innerWidth < 768) return;
-        
         isDragging = true;
         startX = e.clientX;
         startY = e.clientY;
@@ -564,7 +607,6 @@ function initMenuBook() {
     pages.forEach((page, index) => {
         page.addEventListener('click', (e) => {
             if (e.target.closest('a') || e.target.closest('button')) return;
-            if (window.innerWidth < 768) return; // Stacks on mobile
             
             // Prevent auto flip if we just completed a drag
             if (progress > 0.05) return;
@@ -659,3 +701,8 @@ function createEmbers() {
 // Start application immediately
 initApp();
 preloadImages();
+
+// Refresh ScrollTrigger after window is fully loaded to prevent offset bugs
+window.addEventListener('load', () => {
+    ScrollTrigger.refresh();
+});
