@@ -262,20 +262,7 @@ function initRevealAnimations() {
         ease: "power3.out"
     });
     
-    // Reveal Event cards
-    gsap.from(".evento-card", {
-        scrollTrigger: {
-            trigger: ".eventos-grid",
-            start: "top bottom",
-            toggleActions: "play none none none"
-        },
-        opacity: 0,
-        y: 60,
-        duration: 1.2,
-        stagger: 0.25,
-        ease: "power3.out"
-    });
-    
+    // Reveal Event cards (rendered statically to prevent CSS transition and trigger conflicts)
     // Reveal Footer elements
     gsap.from(".footer-cta-block", {
         scrollTrigger: {
