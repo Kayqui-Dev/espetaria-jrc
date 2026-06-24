@@ -92,6 +92,9 @@ function initApp() {
     
     // Initialize reveal animations for sections
     initRevealAnimations();
+
+    // Initialize clean URL smooth scrolling (removes # from URLs)
+    initSmoothScroll();
 }
 
 // Resize Canvas maintaining cover scale
@@ -121,8 +124,15 @@ function renderFrame(frameIndex) {
     
     let drawWidth, drawHeight, drawX, drawY;
     
-    if (canvasRatio > imgRatio) {
-        // Canvas is wider than image aspect ratio
+    if (window.innerWidth < 768) {
+        // Mobile custom: scale the image to fit the width of the screen, and make it slightly larger (scale 1.6)
+        // so it fills the screen horizontally, but doesn't crop the top/bottom too much, and center it vertically
+        drawWidth = canvasWidth * 1.6;
+        drawHeight = drawWidth / imgRatio;
+        drawX = (canvasWidth - drawWidth) / 2;
+        drawY = (canvasHeight - drawHeight) / 2 - 10;
+    } else if (canvasRatio > imgRatio) {
+        // Canvas is wider than image aspect ratio (Desktop landscape cover)
         drawWidth = canvasWidth;
         drawHeight = canvasWidth / imgRatio;
         drawX = 0;
@@ -322,48 +332,216 @@ function updateActiveSection(id) {
     });
 }
 
-// 3D Menu Book Page Flip Logic
+// 3D Menu Book Draggable Page Flip Logic with Soft Bending Pages
 function initMenuBook() {
+    const book = document.getElementById('menu-book');
+    if (!book) return;
+    
     const pages = document.querySelectorAll('.book-page');
     const prevBtn = document.getElementById('book-prev-btn');
     const nextBtn = document.getElementById('book-next-btn');
     
     let currentPage = 1;
     const totalPages = pages.length;
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+    let currentX = 0;
+    let progress = 0;
+    let activePageEl = null;
+    let isFlippingNext = true;
     
     function flipPage(pageIndex, direction) {
         const page = pages[pageIndex - 1];
         if (!page) return;
         
         if (direction === 'next') {
-            page.classList.add('flipped');
-            page.classList.remove('active');
-            
-            // Adjust z-index after flip completes
-            setTimeout(() => {
-                page.style.zIndex = pageIndex;
-            }, 300);
-            
-            // Activate next sheet
-            const nextSheet = pages[pageIndex];
-            if (nextSheet) {
-                nextSheet.classList.add('active');
-                nextSheet.style.zIndex = 10;
-            }
+            gsap.to(page, {
+                rotateY: -180,
+                duration: 0.8,
+                ease: "power2.out",
+                onStart: () => {
+                    page.classList.add('flipped');
+                    page.classList.remove('active');
+                },
+                onComplete: () => {
+                    page.style.zIndex = pageIndex;
+                    const nextSheet = pages[pageIndex];
+                    if (nextSheet) {
+                        nextSheet.classList.add('active');
+                        nextSheet.style.zIndex = 10;
+                    }
+                    // Reset page faces transforms
+                    const faces = page.querySelectorAll('.page-face');
+                    faces.forEach(face => face.style.transform = '');
+                }
+            });
+            // Apply soft page bend during animation
+            gsap.to(page.querySelectorAll('.page-face'), {
+                skewY: (i, el) => el.classList.contains('front') ? -5 : 5,
+                scaleX: 0.95,
+                duration: 0.4,
+                yoyo: true,
+                repeat: 1,
+                ease: "sine.inOut"
+            });
         } else if (direction === 'prev') {
-            page.classList.remove('flipped');
-            page.classList.add('active');
-            page.style.zIndex = 10;
-            
-            // Deactivate next sheet
-            const nextSheet = pages[pageIndex];
-            if (nextSheet) {
-                nextSheet.classList.remove('active');
-                nextSheet.style.zIndex = 5;
-            }
+            gsap.to(page, {
+                rotateY: 0,
+                duration: 0.8,
+                ease: "power2.out",
+                onStart: () => {
+                    page.classList.remove('flipped');
+                    page.classList.add('active');
+                    page.style.zIndex = 10;
+                    const nextSheet = pages[pageIndex];
+                    if (nextSheet) {
+                        nextSheet.classList.remove('active');
+                        nextSheet.style.zIndex = 5;
+                    }
+                },
+                onComplete: () => {
+                    // Reset page faces transforms
+                    const faces = page.querySelectorAll('.page-face');
+                    faces.forEach(face => face.style.transform = '');
+                }
+            });
+            // Apply soft page bend during animation
+            gsap.to(page.querySelectorAll('.page-face'), {
+                skewY: (i, el) => el.classList.contains('back') ? 5 : -5,
+                scaleX: 0.95,
+                duration: 0.4,
+                yoyo: true,
+                repeat: 1,
+                ease: "sine.inOut"
+            });
         }
     }
     
+    // Drag/Swipe tracking
+    book.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('a') || e.target.closest('button')) return;
+        
+        // Skip drag tracking on mobile stacked viewports
+        if (window.innerWidth < 768) return;
+        
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        book.style.cursor = 'grabbing';
+        
+        // Decide if we drag next page or prev page based on clientX position
+        const rect = book.getBoundingClientRect();
+        const relativeX = e.clientX - rect.left;
+        
+        if (relativeX > rect.width / 2) {
+            // Drag next page (current active page)
+            if (currentPage <= totalPages) {
+                isFlippingNext = true;
+                activePageEl = pages[currentPage - 1];
+            } else {
+                activePageEl = null;
+            }
+        } else {
+            // Drag prev page (the one that is flipped)
+            if (currentPage > 1) {
+                isFlippingNext = false;
+                activePageEl = pages[currentPage - 2];
+            } else {
+                activePageEl = null;
+            }
+        }
+        
+        if (activePageEl) {
+            activePageEl.style.transition = 'none';
+        }
+    });
+    
+    window.addEventListener('pointermove', (e) => {
+        if (!isDragging || !activePageEl) return;
+        
+        currentX = e.clientX;
+        const deltaX = currentX - startX;
+        const bookWidth = book.getBoundingClientRect().width;
+        
+        if (isFlippingNext) {
+            // Dragging right to left (deltaX is negative)
+            progress = Math.max(0, Math.min(1, -deltaX / (bookWidth / 2)));
+            const angle = -180 * progress;
+            activePageEl.style.transform = `rotateY(${angle}deg)`;
+            
+            // Soft paper bending effect (skew and scale based on progress)
+            const bend = Math.sin(progress * Math.PI) * 12; // bend peaks in the middle
+            const scale = 1 - Math.sin(progress * Math.PI) * 0.08;
+            
+            const frontFace = activePageEl.querySelector('.page-face.front');
+            if (frontFace) {
+                frontFace.style.transform = `skewY(${-bend}deg) scaleX(${scale})`;
+            }
+        } else {
+            // Dragging left to right (deltaX is positive)
+            progress = Math.max(0, Math.min(1, deltaX / (bookWidth / 2)));
+            const angle = -180 + (180 * progress);
+            activePageEl.style.transform = `rotateY(${angle}deg)`;
+            
+            // Soft paper bending effect
+            const bend = Math.sin(progress * Math.PI) * 12;
+            const scale = 1 - Math.sin(progress * Math.PI) * 0.08;
+            
+            const backFace = activePageEl.querySelector('.page-face.back');
+            if (backFace) {
+                backFace.style.transform = `skewY(${bend}deg) scaleX(${scale})`;
+            }
+        }
+    });
+    
+    window.addEventListener('pointerup', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        book.style.cursor = 'grab';
+        
+        if (!activePageEl) return;
+        
+        if (isFlippingNext) {
+            if (progress > 0.4) {
+                // Complete flip next
+                flipPage(currentPage, 'next');
+                currentPage++;
+            } else {
+                // Cancel flip next (snap back)
+                gsap.to(activePageEl, {
+                    rotateY: 0,
+                    duration: 0.4,
+                    ease: "power2.out",
+                    onComplete: () => {
+                        const frontFace = activePageEl.querySelector('.page-face.front');
+                        if (frontFace) frontFace.style.transform = '';
+                    }
+                });
+            }
+        } else {
+            if (progress > 0.4) {
+                // Complete flip prev
+                currentPage--;
+                flipPage(currentPage, 'prev');
+            } else {
+                // Cancel flip prev (snap back to flipped)
+                gsap.to(activePageEl, {
+                    rotateY: -180,
+                    duration: 0.4,
+                    ease: "power2.out",
+                    onComplete: () => {
+                        const backFace = activePageEl.querySelector('.page-face.back');
+                        if (backFace) backFace.style.transform = '';
+                    }
+                });
+            }
+        }
+        progress = 0;
+        activePageEl = null;
+    });
+    
+    // Control buttons fallback
     if (nextBtn) {
         nextBtn.addEventListener('click', () => {
             if (currentPage <= totalPages) {
@@ -382,10 +560,14 @@ function initMenuBook() {
         });
     }
     
-    // Allow clicking the pages directly to flip them
+    // Allow clicking the pages directly to flip them (only for pointer clicks, not drag releases)
     pages.forEach((page, index) => {
         page.addEventListener('click', (e) => {
             if (e.target.closest('a') || e.target.closest('button')) return;
+            if (window.innerWidth < 768) return; // Stacks on mobile
+            
+            // Prevent auto flip if we just completed a drag
+            if (progress > 0.05) return;
             
             const pageNum = index + 1;
             if (page.classList.contains('flipped')) {
@@ -397,6 +579,44 @@ function initMenuBook() {
                 if (pageNum === currentPage) {
                     flipPage(currentPage, 'next');
                     currentPage++;
+                }
+            }
+        });
+    });
+}
+
+// Clean URL Smooth Scrolling tracking (removes hashes # from URLs)
+function initSmoothScroll() {
+    const links = document.querySelectorAll('.nav-link, .map-dot-wrapper, .hero-actions a, .logo');
+    
+    links.forEach(link => {
+        link.addEventListener('click', e => {
+            let href = link.getAttribute('href');
+            if (!href) {
+                // Check if it's the logo SVG container
+                const parent = link.closest('a');
+                if (parent) href = parent.getAttribute('href');
+            }
+            
+            if (href && href.startsWith('#')) {
+                e.preventDefault();
+                
+                const targetId = href.substring(1);
+                // Special case for scrolling to top when logo or Conceito is clicked
+                const targetEl = targetId === '' || targetId === 'inicio' 
+                    ? document.body 
+                    : document.getElementById(targetId);
+                
+                if (targetEl) {
+                    gsap.to(window, {
+                        scrollTo: {
+                            y: targetEl,
+                            offsetY: 80, // Offset for the fixed pill navbar
+                            autoKill: false
+                        },
+                        duration: 1.2,
+                        ease: "power3.out"
+                    });
                 }
             }
         });

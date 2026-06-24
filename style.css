@@ -1470,33 +1470,36 @@ a {
         left: 0;
         width: 100%;
         height: auto;
-        transform-origin: center center;
         transform: none !important;
         pointer-events: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
     }
     
     .page-face {
         position: relative;
         width: 100%;
-        height: auto;
+        height: auto !important;
         backface-visibility: visible;
         border-radius: 16px !important;
         box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        transform: none !important;
     }
     
     .page-face.back {
-        transform: none;
-        margin-top: -15px; /* Efeito de pilha sobreposta */
+        transform: none !important;
+        margin-top: 0;
     }
     
     .menu-page-wrapper {
         padding: 40px 30px;
-        height: auto;
+        height: auto !important;
     }
     
     .cover-design {
         padding: 60px 30px;
-        height: auto;
+        height: auto !important;
     }
     
     .book-controls {
@@ -1829,6 +1832,9 @@ a {
     .chalkboard-board {
         border-width: 10px;
         padding: 25px 20px;
+    }
+    .chalkboard-board::before {
+        bottom: -10px;
     }
     .chalk-title {
         font-size: 1.8rem;
