@@ -265,8 +265,8 @@ function initRevealAnimations() {
     // Reveal Event cards
     gsap.from(".evento-card", {
         scrollTrigger: {
-            trigger: ".eventos-section",
-            start: "top 95%",
+            trigger: ".eventos-grid",
+            start: "top bottom",
             toggleActions: "play none none none"
         },
         opacity: 0,
